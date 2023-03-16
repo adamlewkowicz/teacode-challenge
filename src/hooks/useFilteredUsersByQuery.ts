@@ -6,15 +6,21 @@ export const useFilteredUsersByQuery = (
   query: string
 ) => {
   const filteredUsersByQuery = useMemo(() => {
-    if (query.trim().length === 0) {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (normalizedQuery.trim().length === 0) {
       return users;
     }
-    const regExp = new RegExp(query, 'gi');
 
     return users.filter((user) => {
-      const isMatchingFirstName = regExp.test(user.first_name);
-      const isMatchingLastName = regExp.test(user.last_name);
-      const isMatchingAny = isMatchingFirstName || isMatchingLastName;
+      const normalizedFirstName = user.first_name.toLowerCase();
+      const normalizedLastName = user.last_name.toLowerCase();
+      const normalizedFullName = user.fullName.toLowerCase();
+
+      const isMatchingAny =
+        normalizedFirstName.includes(normalizedQuery) ||
+        normalizedLastName.includes(normalizedQuery) ||
+        normalizedFullName.includes(normalizedQuery);
+
       return isMatchingAny;
     });
   }, [users, query]);

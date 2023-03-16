@@ -2,7 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { getUsers, User } from '../api/getUsers';
 import { getRandomColor } from '../utils/color';
 
-export type UserExtended = User & { isSelected: boolean; profileColor: string };
+export type UserExtended = User & {
+  isSelected: boolean;
+  profileColor: string;
+  fullName: string;
+};
 
 export const useUsers = () => {
   const [users, setUsers] = useState<UserExtended[]>([]);
@@ -12,12 +16,16 @@ export const useUsers = () => {
   useEffect(() => {
     getUsers()
       .then((data) => {
-        const selectableUsers = data.map((user) => ({
-          ...user,
-          isSelected: false,
-          profileColor: getRandomColor(),
-        }));
-        setUsers(selectableUsers);
+        const normalizedUsers = data
+          .map((user) => ({
+            ...user,
+            isSelected: false,
+            profileColor: getRandomColor(),
+            fullName: `${user.first_name} ${user.last_name}`,
+          }))
+          .sort((userA, userB) => (userA.last_name > userB.last_name ? 1 : -1));
+
+        setUsers(normalizedUsers);
       })
       .catch((error) => setErrorMessage(error.message ?? 'Unknown error'))
       .finally(() => setIsLoading(false));

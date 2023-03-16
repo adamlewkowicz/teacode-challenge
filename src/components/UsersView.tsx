@@ -10,9 +10,17 @@ import { useSearchQuery } from '../hooks/useSearchQuery';
 interface UsersViewProps {}
 
 export const UsersView = (props: UsersViewProps) => {
-  const { isLoading, users, userUpdate } = useUsers();
+  const { isLoading, users, userUpdate, errorMessage } = useUsers();
   const { query, setQuery, deferredQuery, isSearching } = useSearchQuery();
   const filteredUsers = useFilteredUsersByQuery(users, deferredQuery);
+
+  if (errorMessage != null) {
+    return (
+      <Text align="center" color="red.400">
+        An error occured: {errorMessage}
+      </Text>
+    );
+  }
 
   return (
     <Box margin="48px auto" maxWidth="800px">
