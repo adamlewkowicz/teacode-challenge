@@ -14,18 +14,16 @@ interface UserRowProps {
 }
 
 export const UserRow = memo(({ user, query, onUserUpdate }: UserRowProps) => {
-  const fullName = `${user.first_name} ${user.last_name}`;
-
   return (
     <ListItem isSelected={user.isSelected}>
       <UserAvatar user={user} />
       <div>
         {query.length > 0 ? (
           <Highlight query={query} styles={{ bg: 'orange.100' }}>
-            {fullName}
+            {user.fullName}
           </Highlight>
         ) : (
-          fullName
+          user.fullName
         )}
       </div>
       <Checkbox
