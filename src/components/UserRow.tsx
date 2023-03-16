@@ -1,36 +1,56 @@
 import { memo } from 'react';
-import { Avatar, Checkbox, Flex, Td, Text, Tr } from '@chakra-ui/react';
-import { UserSelectable } from '../hooks/useUsers';
+import { UserExtended } from '../hooks/useUsers';
+import styled from '@emotion/styled';
+import { UserAvatar } from './UserAvatar';
+import { Highlight } from '@chakra-ui/react';
 
 interface UserRowProps {
-  user: UserSelectable;
+  user: UserExtended;
   onUserUpdate: (
-    userId: UserSelectable['id'],
-    data: Partial<UserSelectable>
+    userId: UserExtended['id'],
+    data: Partial<UserExtended>
   ) => void;
+  query: string;
 }
 
-export const UserRow = memo(({ user, onUserUpdate }: UserRowProps) => (
-  <Tr key={user.id} bgColor={user.isSelected ? 'blue.50' : 'none'}>
-    <Td>
-      <Flex gap={8} align="center">
-        <Avatar size="md" name={`${user.first_name} ${user.last_name}`} />{' '}
-        <Text minWidth="150px">
-          {/* <Highlight query="sat" styles={{ bg: 'orange.100' }}>
-              {`${user.first_name} ${user.last_name}`}
-            </Highlight> */}
-          {user.first_name} {user.last_name}
-          {/* {(user as any).displayName ?? user.first_name} */}
-        </Text>
-        <Checkbox
-          marginLeft="auto"
-          checked={user.isSelected}
-          onChange={(event) =>
-            onUserUpdate(user.id, { isSelected: event.target.checked })
-          }
-        />
-      </Flex>
-      {/* src={user.avatar} */}
-    </Td>
-  </Tr>
-));
+export const UserRow = memo(({ user, query, onUserUpdate }: UserRowProps) => {
+  const fullName = `${user.first_name} ${user.last_name}`;
+
+  return (
+    <ListItem isSelected={user.isSelected}>
+      <UserAvatar user={user} />
+      <div>
+        {query.length > 0 ? (
+          <Highlight query={query} styles={{ bg: 'orange.100' }}>
+            {fullName}
+          </Highlight>
+        ) : (
+          fullName
+        )}
+      </div>
+      <Checkbox
+        type="checkbox"
+        checked={user.isSelected}
+        onChange={(event) =>
+          onUserUpdate(user.id, { isSelected: event.target.checked })
+        }
+      />
+    </ListItem>
+  );
+});
+
+const ListItem = styled.li<{ isSelected: boolean }>`
+  display: flex;
+  align-items: center;
+  padding: 24px 16px;
+  border-bottom: 1px solid #edf2f7;
+  gap: 36px;
+  background-color: ${(props) => (props.isSelected ? '#ebf8ff' : '#fff')};
+`;
+
+const Checkbox = styled.input`
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
+  accent-color: #3182ce;
+`;

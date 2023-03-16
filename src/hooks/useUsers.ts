@@ -1,10 +1,12 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getUsers, User } from '../api/getUsers';
+import { getRandomColor } from '../utils/color';
 
-export type UserSelectable = User & { isSelected: boolean };
+export type UserExtended = User & { isSelected: boolean; profileColor: string };
 
 export const useUsers = () => {
-  const [users, setUsers] = useState<UserSelectable[]>([]);
+  const [users, setUsers] = useState<UserExtended[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -13,14 +15,16 @@ export const useUsers = () => {
         const selectableUsers = data.map((user) => ({
           ...user,
           isSelected: false,
+          profileColor: getRandomColor(),
         }));
         setUsers(selectableUsers);
       })
+      .catch((error) => setErrorMessage(error.message ?? 'Unknown error'))
       .finally(() => setIsLoading(false));
   }, []);
 
   const userUpdate = useCallback(
-    (userId: UserSelectable['id'], user: Partial<UserSelectable>) => {
+    (userId: UserExtended['id'], user: Partial<UserExtended>) => {
       setUsers((prevUsers) =>
         prevUsers.map((prevUser) => {
           if (prevUser.id === userId) {
@@ -36,15 +40,19 @@ export const useUsers = () => {
     []
   );
 
-  // const selectedUsers = useMemo(() => {
-  //   return users.filter((user) => user.isSelected);
-  // }, [users]);
+  useEffect(() => {
+    // Filtering through selected user ids has been put to requestIdleCallback
+    // to avoid blocking the main thread from more urgent UI updates.
+    const callbackId = requestIdleCallback(() => {
+      const selectedUsers = users.filter((user) => user.isSelected);
+      const joinedIds = selectedUsers.map((user) => user.id).join(', ');
 
-  // useEffect(() => {
-  //   console.log(
-  //     `Selected user ids: ${selectedUsers.map((user) => user.id).join(', ')}`
-  //   );
-  // }, [selectedUsers]);
+      console.log(
+        `Selected user ids: ${selectedUsers.length > 0 ? joinedIds : 'none'}`
+      );
+    });
+    return () => cancelIdleCallback(callbackId);
+  }, [users]);
 
-  return { users, isLoading, userUpdate };
+  return { users, isLoading, errorMessage, userUpdate };
 };

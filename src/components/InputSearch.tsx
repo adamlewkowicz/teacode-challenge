@@ -16,7 +16,12 @@ export const InputSearch = ({
   onTextChange,
   isSearching,
 }: InputSearchProps) => (
-  <InputGroup position="sticky" top="8px" marginBottom="24px">
+  <InputGroup
+    position="sticky"
+    top="8px"
+    margin="24px 0"
+    backgroundColor="#fff"
+  >
     <Input
       placeholder="Search user by first or last name"
       value={value}
@@ -25,7 +30,7 @@ export const InputSearch = ({
     />
     <InputRightElement
       pointerEvents="none"
-      children={<Spinner style={{ opacity: isSearching ? '1' : '0' }} />}
+      children={<Spinner style={{ display: isSearching ? 'block' : 'none' }} />}
     />
   </InputGroup>
 );
