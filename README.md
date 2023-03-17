@@ -13,3 +13,4 @@
 - Highligting search queries.
 - TypeScript based codebase.
 - Contacts sorted alphabetically by last name by default.
+- Additional support added for invalid images (429 error - too many requests).
