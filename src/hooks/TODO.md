@@ -1,4 +1,0 @@
-- Add error handling
-- Refactor
-- Optimize further (useTransition hook!)
-- Fix not selecting row checkbox
